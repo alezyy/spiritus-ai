@@ -19,7 +19,16 @@ Le système permet aux utilisateurs de souscrire à un abonnement "Plus" (20$/mo
     *   Si l'abonnement expire ou est annulé, Stripe prévient le serveur.
     *   L'utilisateur est automatiquement retiré du groupe `group_premium`.
 
-## 2. Mise à jour d'Open WebUI
+## 2. Vérification de l'Email
+
+Nous avons ajouté une fonctionnalité de vérification d'email obligatoire pour les nouveaux utilisateurs.
+
+*   **Inscription** : Lorsqu'un utilisateur s'inscrit, son compte est créé avec le statut `verified: False`.
+*   **Connexion** : La connexion est bloquée tant que l'email n'est pas vérifié.
+*   **Vérification** : Un lien de vérification doit être envoyé par email (implémentation SMTP à configurer). Cliquer sur ce lien appelle l'API `/verify/email` qui passe le statut à `verified: True`.
+*   **Admin** : Les administrateurs sont automatiquement vérifiés à la création.
+
+## 3. Mise à jour d'Open WebUI
 
 Comme nous avons modifié le code source d'Open WebUI pour ajouter cette fonctionnalité, une mise à jour standard (ex: `git pull`) risque d'écraser nos modifications.
 
@@ -43,13 +52,14 @@ Nous avons créé un script spécial pour réappliquer automatiquement nos chang
 3.  **Reconstruire et Redémarrer** :
     Pour que les changements prennent effet, il faut reconstruire le conteneur Docker :
     ```bash
-    docker-compose up -d --build
+    docker-compose up -d --build   ou  docker compose up -d --build ou docker compose build --no-cache
+
     ```
 
 ### En cas de conflit
 Si le script `install_subscription.py` signale une erreur (par exemple si la structure d'Open WebUI a radicalement changé), il faudra vérifier manuellement les fichiers modifiés (`backend/open_webui/routers/payments.py`, etc.) ou faire appel à un développeur.
 
-## 3. Dépannage
+## 4. Dépannage
 
 *   **L'utilisateur a payé mais reste en "Free"** :
     *   Vérifiez que votre tunnel (Ngrok ou autre) est actif si vous êtes en local.
@@ -59,10 +69,16 @@ Si le script `install_subscription.py` signale une erreur (par exemple si la str
 *   **La date de renouvellement ne s'affiche pas** :
     *   Cela peut arriver juste après le paiement. Rafraîchissez la page après quelques secondes.
 
-## 4. Fichiers Clés
+## 5. Fichiers Clés
 
 *   `install_subscription.py` : Le script magique pour réinstaller.
 *   `backend/open_webui/routers/payments.py` : Toute la logique de paiement et de gestion de groupe.
 *   `src/routes/(app)/subscription/+page.svelte` : La page d'abonnement (Frontend).
+*   `backend/open_webui/models/users.py` : Modèle utilisateur (ajout du champ `verified`).
+*   `backend/open_webui/routers/auths.py` : Logique d'authentification et de vérification d'email.
 
 ## The url git : https://github.com/falezy/openwebui-stripe
+
+
+## Keycloak
+https://auth-dev.researchproject.ca/

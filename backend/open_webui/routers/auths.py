@@ -558,6 +558,8 @@ async def signin(request: Request, response: Response, form_data: SigninForm):
         )
 
     if user:
+        if not user.verified:
+            raise HTTPException(400, detail="Email not verified")
 
         expires_delta = parse_duration(request.app.state.config.JWT_EXPIRES_IN)
         expires_at = None
@@ -602,6 +604,21 @@ async def signin(request: Request, response: Response, form_data: SigninForm):
         }
     else:
         raise HTTPException(400, detail=ERROR_MESSAGES.INVALID_CRED)
+
+
+@router.get("/verify/email")
+async def verify_email(token: str):
+    data = decode_token(token)
+    if not data or "id" not in data:
+        raise HTTPException(400, detail="Invalid token")
+
+    user = Users.get_user_by_id(data["id"])
+    if not user:
+        raise HTTPException(400, detail="User not found")
+
+    Users.update_user_by_id(user.id, {"verified": True})
+    return {"message": "Email verified successfully"}
+
 
 
 ############################
@@ -654,6 +671,27 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
         )
 
         if user:
+            if user.role == "admin":
+                Users.update_user_by_id(user.id, {"verified": True})
+                user.verified = True
+
+            if not user.verified:
+                # TODO: Send verification email here
+                log.info(f"User {user.email} created but not verified. Verification email should be sent.")
+                return JSONResponse(
+                    content={
+                        "status": "pending",
+                        "message": "Registration successful. Please verify your email to login.",
+                        "id": user.id,
+                        "email": user.email,
+                        "name": user.name,
+                        "role": user.role,
+                        "profile_image_url": user.profile_image_url,
+                        "verified": False,
+                    },
+                    status_code=200,
+                )
+
             expires_delta = parse_duration(request.app.state.config.JWT_EXPIRES_IN)
             expires_at = None
             if expires_delta:

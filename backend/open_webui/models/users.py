@@ -11,7 +11,7 @@ from open_webui.utils.misc import throttle
 
 
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import BigInteger, Column, String, Text, Date, exists, select
+from sqlalchemy import BigInteger, Column, String, Text, Date, exists, select, Boolean
 from sqlalchemy import or_, case
 
 import datetime
@@ -48,6 +48,8 @@ class User(Base):
     updated_at = Column(BigInteger)
     created_at = Column(BigInteger)
 
+    verified = Column(Boolean, default=False)
+
 
 class UserSettings(BaseModel):
     ui: Optional[dict] = {}
@@ -78,6 +80,8 @@ class UserModel(BaseModel):
     last_active_at: int  # timestamp in epoch
     updated_at: int  # timestamp in epoch
     created_at: int  # timestamp in epoch
+
+    verified: bool = False
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -185,6 +189,7 @@ class UsersTable:
                     "created_at": int(time.time()),
                     "updated_at": int(time.time()),
                     "oauth_sub": oauth_sub,
+                    "verified": False,
                 }
             )
             result = User(**user.model_dump())

@@ -52,6 +52,7 @@ class UserResponse(BaseModel):
     name: str
     role: str
     profile_image_url: str
+    verified: bool = False
 
 
 class SigninResponse(Token, UserResponse):

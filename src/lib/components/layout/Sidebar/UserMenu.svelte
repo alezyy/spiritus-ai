@@ -21,7 +21,17 @@
 	import Code from '$lib/components/icons/Code.svelte';
 	import UserGroup from '$lib/components/icons/UserGroup.svelte';
 	import SignOut from '$lib/components/icons/SignOut.svelte';
+
 	import Sparkles from '$lib/components/icons/Sparkles.svelte';
+	import Flag from '$lib/components/icons/Flag.svelte';
+	import PencilSquare from '$lib/components/icons/PencilSquare.svelte';
+	import DocumentText from '$lib/components/icons/DocumentText.svelte';
+	import ArrowDownTray from '$lib/components/icons/ArrowDownTray.svelte';
+	import Bolt from '$lib/components/icons/Bolt.svelte';
+	import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
+	import ArrowLeft from '$lib/components/icons/ArrowLeft.svelte';
+	import Envelope from '$lib/components/icons/Envelope.svelte';
+	import Play from '$lib/components/icons/Play.svelte';
 
 	const i18n = getContext('i18n');
 
@@ -29,6 +39,8 @@
 	export let role = '';
 	export let help = false;
 	export let className = 'max-w-[240px]';
+
+
 
 	const dispatch = createEventDispatcher();
 
@@ -57,6 +69,9 @@
 	bind:open={show}
 	onOpenChange={(state) => {
 		dispatch('change', state);
+		if (!state) {
+			// Reset help view when closed
+		}
 	}}
 >
 	<DropdownMenu.Trigger>
@@ -71,62 +86,24 @@
 			align="end"
 			transition={(e) => fade(e, { duration: 100 })}
 		>
-			<DropdownMenu.Item
-				class="flex gap-2 items-center px-3 py-2 text-sm  font-medium cursor-pointer"
-				on:click={() => {
-					goto('/subscription');
-				}}
-			>
-				<Sparkles className="size-4" />
-				<div class="flex items-center">{$i18n.t('Subscription')}</div>
-			</DropdownMenu.Item>
 
-			<DropdownMenu.Item
-				class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer"
-				on:click={async () => {
-					show = false;
-
-					await showSettings.set(true);
-
-					if ($mobile) {
-						await tick();
-						showSidebar.set(false);
-					}
-				}}
-			>
-				<div class=" self-center mr-3">
-					<Settings className="w-5 h-5" strokeWidth="1.5" />
-				</div>
-				<div class=" self-center truncate">{$i18n.t('Settings')}</div>
-			</DropdownMenu.Item>
-
-			<DropdownMenu.Item
-				class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer"
-				on:click={async () => {
-					show = false;
-
-					dispatch('show', 'archived-chat');
-
-					if ($mobile) {
-						await tick();
-
-						showSidebar.set(false);
-					}
-				}}
-			>
-				<div class=" self-center mr-3">
-					<ArchiveBox className="size-5" strokeWidth="1.5" />
-				</div>
-				<div class=" self-center truncate">{$i18n.t('Archived Chats')}</div>
-			</DropdownMenu.Item>
-
-			{#if role === 'admin'}
 				<DropdownMenu.Item
-					as="a"
-					href="/playground"
-					class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition select-none"
+					class="flex gap-2 items-center px-3 py-2 text-sm  font-medium cursor-pointer"
+					on:click={() => {
+						goto('/subscription');
+					}}
+				>
+					<Sparkles className="size-4" />
+					<div class="flex items-center">{$i18n.t('Subscription')}</div>
+				</DropdownMenu.Item>
+
+				<DropdownMenu.Item
+					class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer"
 					on:click={async () => {
 						show = false;
+
+						await showSettings.set(true);
+
 						if ($mobile) {
 							await tick();
 							showSidebar.set(false);
@@ -134,103 +111,187 @@
 					}}
 				>
 					<div class=" self-center mr-3">
-						<Code className="size-5" strokeWidth="1.5" />
+						<Settings className="w-5 h-5" strokeWidth="1.5" />
 					</div>
-					<div class=" self-center truncate">{$i18n.t('Playground')}</div>
+					<div class=" self-center truncate">{$i18n.t('Settings')}</div>
 				</DropdownMenu.Item>
 
 				<DropdownMenu.Item
-					as="a"
-					href="/admin"
-					class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition select-none"
+					class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer"
 					on:click={async () => {
 						show = false;
+
+						dispatch('show', 'archived-chat');
+
 						if ($mobile) {
 							await tick();
+
 							showSidebar.set(false);
 						}
 					}}
 				>
 					<div class=" self-center mr-3">
-						<UserGroup className="w-5 h-5" strokeWidth="1.5" />
+						<ArchiveBox className="size-5" strokeWidth="1.5" />
 					</div>
-					<div class=" self-center truncate">{$i18n.t('Admin Panel')}</div>
+					<div class=" self-center truncate">{$i18n.t('Archived Chats')}</div>
 				</DropdownMenu.Item>
-			{/if}
 
-			{#if help}
-				<hr class=" border-gray-50 dark:border-gray-800 my-1 p-0" />
-
-				<!-- {$i18n.t('Help')} -->
-
-				{#if $user?.role === 'admin'}
+				{#if role === 'admin'}
 					<DropdownMenu.Item
 						as="a"
-						target="_blank"
-						class="flex gap-3 items-center py-1.5 px-3 text-sm select-none w-full cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition"
-						id="chat-share-button"
-						on:click={() => {
+						href="/playground"
+						class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition select-none"
+						on:click={async () => {
 							show = false;
+							if ($mobile) {
+								await tick();
+								showSidebar.set(false);
+							}
 						}}
-						href="https://docs.openwebui.com"
 					>
-						<QuestionMarkCircle className="size-5" />
-						<div class="flex items-center">{$i18n.t('Documentation')}</div>
+						<div class=" self-center mr-3">
+							<Code className="size-5" strokeWidth="1.5" />
+						</div>
+						<div class=" self-center truncate">{$i18n.t('Playground')}</div>
 					</DropdownMenu.Item>
 
-					<!-- Releases -->
-
 					<DropdownMenu.Item
 						as="a"
-						target="_blank"
-						class="flex gap-3 items-center py-1.5 px-3 text-sm select-none w-full cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition"
-						id="chat-share-button"
-						on:click={() => {
+						href="/admin"
+						class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition select-none"
+						on:click={async () => {
 							show = false;
+							if ($mobile) {
+								await tick();
+								showSidebar.set(false);
+							}
 						}}
-						href="https://github.com/open-webui/open-webui/releases"
 					>
-						<Map className="size-5" />
-						<div class="flex items-center">{$i18n.t('Releases')}</div>
+						<div class=" self-center mr-3">
+							<UserGroup className="w-5 h-5" strokeWidth="1.5" />
+						</div>
+						<div class=" self-center truncate">{$i18n.t('Admin Panel')}</div>
 					</DropdownMenu.Item>
 				{/if}
 
-				<DropdownMenu.Item
-					class="flex gap-3 items-center py-1.5 px-3 text-sm select-none w-full  hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
-					id="chat-share-button"
-					on:click={async () => {
-						show = false;
-						showShortcuts.set(!$showShortcuts);
+				<DropdownMenu.Sub>
+					<DropdownMenu.SubTrigger
+						class="flex justify-between rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer"
+					>
+						<div class="flex items-center">
+							<div class="self-center mr-3">
+								<QuestionMarkCircle className="size-5" strokeWidth="1.5" />
+							</div>
+							<div class="self-center truncate">{$i18n.t('Help')}</div>
+						</div>
+						<div class="self-center">
+							<ChevronRight className="size-4" />
+						</div>
+					</DropdownMenu.SubTrigger>
+					<DropdownMenu.SubContent
+						class="w-full max-w-[200px] rounded-2xl px-1 py-1 border border-gray-100 dark:border-gray-800 z-50 bg-white dark:bg-gray-850 dark:text-white shadow-lg text-sm"
+						sideOffset={8}
+						side="right"
+						align="start"
+					>
+						<DropdownMenu.Item
+							as="a"
+							href="/contact"
+							target="_blank"
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
+						>
+							<Envelope className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Contact')}</div>
+						</DropdownMenu.Item>
 
-						if ($mobile) {
-							await tick();
-							showSidebar.set(false);
-						}
+						<DropdownMenu.Item
+							as="a"
+							href="/education"
+							target="_blank"
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
+						>
+							<Play className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Video formation')}</div>
+						</DropdownMenu.Item>
+
+						<DropdownMenu.Item
+							as="a"
+							href="https://docs.openwebui.com"
+							target="_blank"
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
+						>
+							<QuestionMarkCircle className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Help center')}</div>
+						</DropdownMenu.Item>
+
+						<DropdownMenu.Item
+							as="a"
+							href="https://github.com/open-webui/open-webui/releases"
+							target="_blank"
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
+						>
+							<PencilSquare className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Release notes')}</div>
+						</DropdownMenu.Item>
+
+						<DropdownMenu.Item
+							as="a"
+							href="/terms"
+							target="_blank"
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
+						>
+							<DocumentText className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Terms & policies')}</div>
+						</DropdownMenu.Item>
+
+						<DropdownMenu.Item
+							as="a"
+							href="https://github.com/open-webui/open-webui/issues/new/choose"
+							target="_blank"
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer my-1"
+						>
+							<Flag className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Report Bug')}</div>
+						</DropdownMenu.Item>
+
+
+
+						<DropdownMenu.Item
+							class="flex gap-3 items-center py-2 px-3 text-sm select-none w-full hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition cursor-pointer"
+							on:click={async () => {
+								show = false;
+								showShortcuts.set(!$showShortcuts);
+
+								if ($mobile) {
+									await tick();
+									showSidebar.set(false);
+								}
+							}}
+						>
+							<Bolt className="size-5" strokeWidth="1.5" />
+							<div class="flex items-center">{$i18n.t('Keyboard shortcuts')}</div>
+						</DropdownMenu.Item>
+					</DropdownMenu.SubContent>
+				</DropdownMenu.Sub>
+
+				<hr class=" border-gray-50 dark:border-gray-800 my-1 p-0" />
+
+				<DropdownMenu.Item
+					class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+					on:click={async () => {
+						const res = await userSignOut();
+						user.set(null);
+						localStorage.removeItem('token');
+
+						location.href = res?.redirect_url ?? '/auth';
+						show = false;
 					}}
 				>
-					<Keyboard className="size-5" />
-					<div class="flex items-center">{$i18n.t('Keyboard shortcuts')}</div>
+					<div class=" self-center mr-3">
+						<SignOut className="w-5 h-5" strokeWidth="1.5" />
+					</div>
+					<div class=" self-center truncate">{$i18n.t('Sign Out')}</div>
 				</DropdownMenu.Item>
-			{/if}
-
-			<hr class=" border-gray-50 dark:border-gray-800 my-1 p-0" />
-
-			<DropdownMenu.Item
-				class="flex rounded-xl py-1.5 px-3 w-full hover:bg-gray-50 dark:hover:bg-gray-800 transition"
-				on:click={async () => {
-					const res = await userSignOut();
-					user.set(null);
-					localStorage.removeItem('token');
-
-					location.href = res?.redirect_url ?? '/auth';
-					show = false;
-				}}
-			>
-				<div class=" self-center mr-3">
-					<SignOut className="w-5 h-5" strokeWidth="1.5" />
-				</div>
-				<div class=" self-center truncate">{$i18n.t('Sign Out')}</div>
-			</DropdownMenu.Item>
 
 			{#if usage}
 				{#if usage?.user_ids?.length > 0}

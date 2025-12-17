@@ -83,6 +83,7 @@
 		await setSessionUser(sessionUser);
 	};
 
+
 	const ldapSignInHandler = async () => {
 		const sessionUser = await ldapUserSignIn(ldapUsername, password).catch((error) => {
 			toast.error(`${error}`);
